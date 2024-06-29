@@ -1,0 +1,1 @@
+Server to collect memory usage data instead of using browser tools like Chrome memory tab.
