@@ -7,6 +7,7 @@
 <body>
     <canvas id="memoryChart" width="800" height="400"></canvas>
     <div id="deltaTime"></div> <!-- Added div to display delta time -->
+    <div id="averageTimes"></div> <!-- Added div to display average times -->
     <script>
         fetch('/memory-data')
             .then(response => response.json())
@@ -39,6 +40,28 @@
                 const timeValues = data.map(entry => new Date(entry.time).getTime());
                 const deltaTime = new Date(Math.max(...timeValues) - Math.min(...timeValues)).toISOString().substr(11, 8);
                 document.getElementById('deltaTime').innerText = `Delta Time: ${deltaTime}`;
+
+                // Calculate and display average times
+                const thirtyMinutes = 30 * 60 * 1000;
+                const startTime = Math.min(...timeValues);
+                const endTime = Math.max(...timeValues);
+                const averageTimes = [];
+
+                for (let i = startTime; i <= endTime; i += thirtyMinutes) {
+                    let totalData = 1;
+                    const end = i + thirtyMinutes;
+                    const total = data.reduce((sum, data) => {
+                        if (new Date(data.time).getTime() < end) {
+                            sum += data.memory.usedJSHeapSize
+                            totalData += 1;
+                        }
+                        return sum;
+                    }, 0);
+                    averageTimes.push(`Average Usage for ${new Date(i).toLocaleTimeString()} - ${new Date(i + thirtyMinutes).toLocaleTimeString()}: ${total/totalData}`);
+                    totalData = 0;
+                }
+
+                document.getElementById('averageTimes').innerHTML = averageTimes.join('<br>');
             })
             .catch(error => console.error('Error fetching data:', error));
     </script>

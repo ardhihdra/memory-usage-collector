@@ -34,8 +34,12 @@ app.post('/api/data', (req, res) => {
 
     // Load existing data from memory-data.json
     let data = [];
+    const date = new Date().toISOString().split('T')[0];
+    // const fileName = `memory-data-${date}.json`;
+    const fileName = `memory-data.json`;
+    console.log('filename', fileName);
     try {
-        data = JSON.parse(fs.readFileSync('memory-data.json'));
+        data = JSON.parse(fs.readFileSync(fileName));
     } catch (error) {
         console.error("Error reading memory-data.json file");
     }
@@ -44,7 +48,7 @@ app.post('/api/data', (req, res) => {
     data.push({ time, memory });
 
     // Write the updated data back to memory-data.json
-    fs.writeFileSync('memory-data.json', JSON.stringify(data, null, 2));
+    fs.writeFileSync(fileName, JSON.stringify(data, null, 2));
 
     res.send('Data appended successfully');
 });
